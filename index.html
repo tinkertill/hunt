@@ -1,0 +1,50 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Treasure Hunt Clue</title>
+<style>
+:root{--c:#E2725B;--bg:#FFF7F5}
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:#222;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{background:#fff;border-radius:28px;max-width:520px;width:100%;padding:32px 26px 36px;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.12);border-top:12px solid var(--c);animation:pop .5s ease}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.icon{font-size:72px;line-height:1}
+.theme{margin-top:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:14px;color:var(--c)}
+.step{margin-top:6px;font-size:15px;color:#777}
+.clue{margin-top:22px;font-size:27px;line-height:1.35;font-weight:700}
+.bar{margin:26px auto 0;height:10px;border-radius:5px;background:#eee;overflow:hidden;max-width:300px}
+.bar i{display:block;height:100%;background:var(--c)}
+.end .clue{font-size:30px}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.confetti b{position:absolute;top:-20px;width:10px;height:16px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+footer{position:fixed;bottom:10px;left:0;right:0;text-align:center;font-size:12px;color:#aaa}
+</style></head><body>
+<div class="card" id="card"><div class="icon" id="icon">🔍</div><div class="theme" id="theme">Treasure Hunt</div>
+<div class="step" id="step"></div><div class="clue" id="clue">Scan a treasure hunt card with your phone camera to see your clue.</div>
+<div class="bar" id="bar" hidden><i id="fill"></i></div></div>
+<footer id="foot">Treasure hunt by TinkerTill</footer>
+<script>
+const T={xmas:["🎄","#C0392B","#FDF0EE"],pirate:["🏴‍☠️","#1F4E79","#EEF4FA"],space:["🚀","#4B2A8C","#F3EFFA"],custom:["🔍","#E2725B","#FFF7F5"]};
+const L={en:{clue:"Clue {k} of {n}",final:"Final clue!",hunt:"Treasure Hunt",xmas:"Christmas Treasure Hunt",pirate:"Pirate Treasure Hunt",space:"Space Mission",custom:"Treasure Hunt",by:"Treasure hunt by TinkerTill",idle:"Scan a treasure hunt card with your phone camera to see your clue."},
+ fr:{clue:"Indice {k} sur {n}",final:"Dernier indice !",xmas:"Chasse au trésor de Noël",pirate:"Chasse au trésor des pirates",space:"Mission spatiale",custom:"Chasse au trésor",by:"Chasse au trésor par TinkerTill"},
+ de:{clue:"Hinweis {k} von {n}",final:"Letzter Hinweis!",xmas:"Weihnachts-Schatzsuche",pirate:"Piraten-Schatzsuche",space:"Weltraum-Mission",custom:"Schatzsuche",by:"Schatzsuche von TinkerTill"},
+ es:{clue:"Pista {k} de {n}",final:"¡Última pista!",xmas:"Búsqueda del tesoro de Navidad",pirate:"Búsqueda del tesoro pirata",space:"Misión espacial",custom:"Búsqueda del tesoro",by:"Búsqueda del tesoro de TinkerTill"}};
+const $=id=>document.getElementById(id);
+function dec(b){b=b.replace(/-/g,"+").replace(/_/g,"/");while(b.length%4)b+="=";
+ return new TextDecoder().decode(Uint8Array.from(atob(b),c=>c.charCodeAt(0)));}
+try{
+ const [t,lg,n,of,b]=decodeURIComponent(location.hash.slice(1)).split("/");
+ if(b){const th=T[t]||T.custom,s=L[lg]||L.en,k=+n,tot=+of,last=k===tot;
+  document.documentElement.lang=L[lg]?lg:"en";
+  document.documentElement.style.setProperty("--c",th[1]);document.documentElement.style.setProperty("--bg",th[2]);
+  $("icon").textContent=last?"🎉":th[0]; $("theme").textContent=s[t]||s.custom;
+  $("step").textContent=last?s.final:s.clue.replace("{k}",k).replace("{n}",tot);
+  $("clue").textContent=dec(b); $("foot").textContent=s.by;
+  $("bar").hidden=false; $("fill").style.width=(k/tot*100)+"%";
+  if(last){$("card").classList.add("end");const c=document.createElement("div");c.className="confetti";
+   for(let i=0;i<80;i++){const p=document.createElement("b");p.style.left=Math.random()*100+"vw";
+    p.style.background=["#E2725B","#F4C430","#2A9D8F","#4B2A8C","#C0392B"][i%5];
+    p.style.animationDuration=(2+Math.random()*3)+"s";p.style.animationDelay=Math.random()*1.5+"s";c.appendChild(p);}
+   document.body.appendChild(c);}
+  document.title=(s[t]||s.custom)+" - "+$("step").textContent;}
+}catch(e){}
+</script></body></html>
